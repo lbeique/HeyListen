@@ -4,18 +4,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HeyListen.Models
 {
-  public class Message
+  public class Song
   {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-    public string Text { get; set; }
-    [Required]
-    public int ChannelId { get; set; } 
+    public string Name { get; set; }
+    public string UserId { get; set; }
+    public int ChannelId { get; set; }
+    public User? User { get; set; }
     public Channel? Channel { get; set; }
-    [Required]
-    public string? SenderId { get; set; }
-    public User? Sender { get; set; }
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    
   }
 }

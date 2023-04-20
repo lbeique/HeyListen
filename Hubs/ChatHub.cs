@@ -1,41 +1,35 @@
 using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Threading.Tasks;
 
-namespace HeyListen.Hubs
+namespace HeyListen.Hubs;
+
+public class ChatHub : Hub
 {
-  public class ChatHub : Hub
-  {
+
     public override Task OnConnectedAsync()
     {
-      Console.WriteLine("A Client Connected: " + Context.ConnectionId);
-      return base.OnConnectedAsync();
+        Console.WriteLine("A Client Connected: " + Context.ConnectionId);
+        return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception exception)
     {
-      Console.WriteLine("A client disconnected: " + Context.ConnectionId);
-      return base.OnDisconnectedAsync(exception);
+        Console.WriteLine("A client disconnected: " + Context.ConnectionId);
+        return base.OnDisconnectedAsync(exception);
     }
 
     public async Task SendMessage(string message)
     {
-      Console.WriteLine($"Received message: {message}");
-      await Clients.All.SendAsync("ReceiveMessage", message);
+        Console.WriteLine("Message Received: " + message);
     }
 
-    public async Task AddToGroup(string groupName)
+    public async Task AddToGroup(int groupId)
     {
-      await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-
-      await Clients.Group(groupName).SendAsync("Send", $"{Context.ConnectionId} has joined the group {groupName}.");
+        await Groups.AddToGroupAsync(Context.ConnectionId, groupId.ToString());
     }
 
-    public async Task RemoveFromGroup(string groupName)
+    public async Task RemoveFromGroup(int groupId)
     {
-      await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-
-      await Clients.Group(groupName).SendAsync("Send", $"{Context.ConnectionId} has left the group {groupName}.");
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId.ToString());
     }
-  }
+
 }

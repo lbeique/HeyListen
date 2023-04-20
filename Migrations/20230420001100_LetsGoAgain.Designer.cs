@@ -3,6 +3,7 @@ using System;
 using HeyListen.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HeyListen.Migrations
 {
     [DbContext(typeof(HeyListenDbContext))]
-    partial class HeyListenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230420001100_LetsGoAgain")]
+    partial class LetsGoAgain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,7 +127,7 @@ namespace HeyListen.Migrations
                             ChannelId = 1,
                             SenderId = "cd061435-79a4-4484-be7a-88b3ea6ff827",
                             Text = "Hey, what's up?",
-                            Timestamp = new DateTime(2023, 4, 20, 1, 21, 46, 952, DateTimeKind.Utc).AddTicks(2390)
+                            Timestamp = new DateTime(2023, 4, 20, 0, 11, 0, 452, DateTimeKind.Utc).AddTicks(7468)
                         });
                 });
 
@@ -229,7 +232,7 @@ namespace HeyListen.Migrations
             modelBuilder.Entity("HeyListen.Models.Song", b =>
                 {
                     b.HasOne("HeyListen.Models.Channel", "Channel")
-                        .WithMany("Songs")
+                        .WithMany()
                         .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -267,8 +270,6 @@ namespace HeyListen.Migrations
             modelBuilder.Entity("HeyListen.Models.Channel", b =>
                 {
                     b.Navigation("Messages");
-
-                    b.Navigation("Songs");
 
                     b.Navigation("UserChannels");
                 });

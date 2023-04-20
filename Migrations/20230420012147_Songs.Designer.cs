@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HeyListen.Migrations
 {
     [DbContext(typeof(HeyListenDbContext))]
-    [Migration("20230411084924_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20230420012147_Songs")]
+    partial class Songs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,10 +25,17 @@ namespace HeyListen.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.HasSequence<int>("channels_id_seq");
+
+            modelBuilder.HasSequence<int>("messages_id_seq");
+
             modelBuilder.Entity("HeyListen.Models.Channel", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
@@ -54,7 +61,7 @@ namespace HeyListen.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1",
+                            Id = 1,
                             AuthorId = "cd061435-79a4-4484-be7a-88b3ea6ff827",
                             Description = "A high-energy EDM channel featuring the latest electronic dance music hits, remixes, and exclusive live sets from top DJs and producers around the world.",
                             IsPrivate = false,
@@ -62,7 +69,7 @@ namespace HeyListen.Migrations
                         },
                         new
                         {
-                            Id = "2",
+                            Id = 2,
                             AuthorId = "cd061435-79a4-4484-be7a-88b3ea6ff827",
                             Description = "A classic rock channel dedicated to the iconic bands and songs from the 60s, 70s, and 80s, featuring legends like Led Zeppelin, Pink Floyd, and The Rolling Stones.",
                             IsPrivate = false,
@@ -70,7 +77,7 @@ namespace HeyListen.Migrations
                         },
                         new
                         {
-                            Id = "3",
+                            Id = 3,
                             AuthorId = "cd061435-79a4-4484-be7a-88b3ea6ff827",
                             Description = "A channel that celebrates the rich culture of hip-hop, featuring the latest releases, classic tracks, interviews with industry insiders, and exclusive content from up-and-coming artists.",
                             IsPrivate = false,
@@ -80,25 +87,27 @@ namespace HeyListen.Migrations
 
             modelBuilder.Entity("HeyListen.Models.Message", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ChannelId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("Usersub")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -107,29 +116,67 @@ namespace HeyListen.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Usersub");
 
                     b.ToTable("Messages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ChannelId = 1,
+                            SenderId = "cd061435-79a4-4484-be7a-88b3ea6ff827",
+                            Text = "Hey, what's up?",
+                            Timestamp = new DateTime(2023, 4, 20, 1, 21, 46, 952, DateTimeKind.Utc).AddTicks(2390)
+                        });
                 });
 
-            modelBuilder.Entity("HeyListen.Models.User", b =>
+            modelBuilder.Entity("HeyListen.Models.Song", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("CognitoUsername")
+                    b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Songs");
+                });
+
+            modelBuilder.Entity("HeyListen.Models.User", b =>
+                {
+                    b.Property<string>("sub")
+                        .HasColumnType("text");
+
+                    b.Property<string>("username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("sub");
 
                     b.ToTable("Users");
 
                     b.HasData(
                         new
                         {
-                            Id = "cd061435-79a4-4484-be7a-88b3ea6ff827",
-                            CognitoUsername = "chicken"
+                            sub = "cd061435-79a4-4484-be7a-88b3ea6ff827",
+                            username = "chicken"
                         });
                 });
 
@@ -138,14 +185,14 @@ namespace HeyListen.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.Property<string>("ChannelId")
-                        .HasColumnType("text");
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("integer");
 
                     b.HasKey("UserId", "ChannelId");
 
                     b.HasIndex("ChannelId");
 
-                    b.ToTable("UserChannel");
+                    b.ToTable("UserChannels");
                 });
 
             modelBuilder.Entity("HeyListen.Models.Channel", b =>
@@ -175,11 +222,30 @@ namespace HeyListen.Migrations
 
                     b.HasOne("HeyListen.Models.User", null)
                         .WithMany("ReceivedMessages")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("Usersub");
 
                     b.Navigation("Channel");
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("HeyListen.Models.Song", b =>
+                {
+                    b.HasOne("HeyListen.Models.Channel", "Channel")
+                        .WithMany("Songs")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HeyListen.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HeyListen.Models.UserChannel", b =>
@@ -204,6 +270,8 @@ namespace HeyListen.Migrations
             modelBuilder.Entity("HeyListen.Models.Channel", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("Songs");
 
                     b.Navigation("UserChannels");
                 });
